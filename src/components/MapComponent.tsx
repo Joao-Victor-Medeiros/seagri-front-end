@@ -40,13 +40,13 @@ export function MapComponent({ onLocationSelect, selectedLocation }: MapComponen
         },
         (error) => {
           console.warn('Erro ao obter localização:', error);
-          // Localização padrão (São Paulo)
-          setUserLocation({ lat: -23.5505, lng: -46.6333 });
+          // Localização padrão (Distrito Federal - Brasília)
+          setUserLocation({ lat: -15.7939, lng: -47.8828 });
         }
       );
     } else {
-      // Localização padrão (São Paulo)
-      setUserLocation({ lat: -23.5505, lng: -46.6333 });
+      // Localização padrão (Distrito Federal - Brasília)
+      setUserLocation({ lat: -15.7939, lng: -47.8828 });
     }
   }, []);
 
