@@ -15,10 +15,10 @@ const Index = () => {
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            Formulário com Mapa
+            Formulário de cadastro do agricultor
           </h1>
           <p className="text-muted-foreground">
-            Preencha seus dados e selecione sua localização no mapa
+            Seagri - DF
           </p>
         </div>
 
@@ -28,18 +28,6 @@ const Index = () => {
               onLocationSelect={handleLocationSelect}
               selectedLocation={selectedLocation}
             />
-          </div>
-          
-          <div className="order-1 lg:order-2">
-            <div className="sticky top-4">
-              <h3 className="text-lg font-semibold mb-4 text-foreground">
-                Selecione sua localização
-              </h3>
-              <MapComponent 
-                onLocationSelect={handleLocationSelect}
-                selectedLocation={selectedLocation}
-              />
-            </div>
           </div>
         </div>
       </div>
