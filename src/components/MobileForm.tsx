@@ -415,7 +415,7 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl bg-card rounded-lg p-4 md:p-6 shadow-lg border">
+      <div className="w-full max-w-4xl mx-auto bg-card rounded-lg p-4 md:p-6 shadow-lg border">
         {/* Header com título e progresso */}
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-4">
