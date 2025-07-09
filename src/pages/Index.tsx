@@ -22,9 +22,9 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <div className="order-2 lg:order-1">
-            <MobileForm 
+        <div className="flex justify-center">
+          <div className="w-full max-w-2xl">
+            <MobileForm
               onLocationSelect={handleLocationSelect}
               selectedLocation={selectedLocation}
             />
