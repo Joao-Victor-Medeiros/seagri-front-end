@@ -17,9 +17,11 @@ interface FormData {
   cpf: string;
 
   // Perfil da Produção
-  propertyName: string;
   propertySize: string;
   mainCrop: string;
+  mainCropOther: string;
+  secCrop: string;
+  secCropOther: string;
   productionType: string;
   harvestPeriod: string;
 
@@ -51,9 +53,11 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
     cpf: '',
 
     // Perfil da Produção
-    propertyName: '',
     propertySize: '',
     mainCrop: '',
+    mainCropOther: '',
+    secCrop: '',
+    secCropOther: '',
     productionType: '',
     harvestPeriod: '',
 
@@ -79,7 +83,8 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
       case 'personal':
         return !!(formData.name && formData.email && formData.phone && formData.cpf);
       case 'production':
-        return !!(formData.propertyName && formData.propertySize && formData.mainCrop && formData.productionType);
+        const hasMainCrop = formData.mainCrop && (formData.mainCrop !== 'outros' || formData.mainCropOther);
+        return !!(formData.propertySize && hasMainCrop && formData.productionType);
       case 'location':
         return !!(selectedLocation && formData.ruralAddress && formData.municipality && formData.state);
       default:
@@ -225,80 +230,97 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
   const renderProductionProfile = () => (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="propertyName">Nome da Propriedade *</Label>
+        <Label htmlFor="propertySize">Área dedicada (hectares) *</Label>
         <Input
-          id="propertyName"
-          type="text"
-          value={formData.propertyName}
-          onChange={(e) => handleInputChange('propertyName', e.target.value)}
-          placeholder="Nome da sua propriedade rural"
+          id="propertySize"
+          type="number"
+          value={formData.propertySize}
+          onChange={(e) => handleInputChange('propertySize', e.target.value)}
+          placeholder="Ex: 5.5"
           required
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="propertySize">Tamanho da Propriedade *</Label>
-        <Select value={formData.propertySize} onValueChange={(value) => handleInputChange('propertySize', value)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Selecione o tamanho" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="até-5ha">Até 5 hectares</SelectItem>
-            <SelectItem value="5-20ha">5 a 20 hectares</SelectItem>
-            <SelectItem value="20-50ha">20 a 50 hectares</SelectItem>
-            <SelectItem value="50-100ha">50 a 100 hectares</SelectItem>
-            <SelectItem value="mais-100ha">Mais de 100 hectares</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="mainCrop">Cultura Principal *</Label>
-        <Select value={formData.mainCrop} onValueChange={(value) => handleInputChange('mainCrop', value)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Selecione a cultura principal" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="soja">Soja</SelectItem>
-            <SelectItem value="milho">Milho</SelectItem>
-            <SelectItem value="algodao">Algodão</SelectItem>
-            <SelectItem value="cana">Cana-de-açúcar</SelectItem>
-            <SelectItem value="cafe">Café</SelectItem>
-            <SelectItem value="arroz">Arroz</SelectItem>
-            <SelectItem value="feijao">Feijão</SelectItem>
-            <SelectItem value="frutas">Frutas</SelectItem>
-            <SelectItem value="hortalicas">Hortaliças</SelectItem>
-            <SelectItem value="pecuaria">Pecuária</SelectItem>
-            <SelectItem value="outros">Outros</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="productionType">Tipo de Produção *</Label>
+        <Label htmlFor="productionType">Regime de produção *</Label>
         <Select value={formData.productionType} onValueChange={(value) => handleInputChange('productionType', value)}>
           <SelectTrigger>
             <SelectValue placeholder="Selecione o tipo de produção" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="convencional">Convencional</SelectItem>
+            <SelectItem value="familiar">Familiar</SelectItem>
             <SelectItem value="organico">Orgânico</SelectItem>
-            <SelectItem value="hidroponia">Hidroponia</SelectItem>
-            <SelectItem value="agroflorestal">Agroflorestal</SelectItem>
+            <SelectItem value="pequeno-produtor">Pequeno produtor</SelectItem>
+            <SelectItem value="agroecologica">Agroecológica</SelectItem>
             <SelectItem value="misto">Misto</SelectItem>
+            <SelectItem value="convencional">Convencional</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="harvestPeriod">Período de Colheita</Label>
-        <Input
-          id="harvestPeriod"
-          type="text"
-          value={formData.harvestPeriod}
-          onChange={(e) => handleInputChange('harvestPeriod', e.target.value)}
-          placeholder="Ex: Janeiro a Março"
-        />
+        <Label htmlFor="mainCrop">Seguimento Principal *</Label>
+        <Select value={formData.mainCrop} onValueChange={(value) => handleInputChange('mainCrop', value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Selecione a cultura principal" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="hortalicas">Hortaliças</SelectItem>
+            <SelectItem value="floricultura">Floricultura</SelectItem>
+            <SelectItem value="graos">Grãos</SelectItem>
+            <SelectItem value="cafeicultura">Cafeicultura</SelectItem>
+            <SelectItem value="apículas">Apículas</SelectItem>
+            <SelectItem value="laticínios">Laticínios</SelectItem>
+            <SelectItem value="aveicultura">Aveicultura</SelectItem>
+            <SelectItem value="suinocultura">Suinocultura</SelectItem>
+            <SelectItem value="bovino">Bovinocultura</SelectItem>
+            <SelectItem value="ovinocultura">Ovinocultura</SelectItem>
+            <SelectItem value="fruticultura">Fruticultura</SelectItem>
+            <SelectItem value="outros">Outros</SelectItem>
+          </SelectContent>
+        </Select>
+        {formData.mainCrop === 'outros' && (
+          <Input
+            id="mainCropOther"
+            type="text"
+            value={formData.mainCropOther}
+            onChange={(e) => handleInputChange('mainCropOther', e.target.value)}
+            placeholder="Especifique o seguimento principal"
+            required
+          />
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="secCrop">Seguimento secundário</Label>
+        <Select value={formData.secCrop} onValueChange={(value) => handleInputChange('secCrop', value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Selecione a cultura secundária" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="hortalicas">Hortaliças</SelectItem>
+            <SelectItem value="floricultura">Floricultura</SelectItem>
+            <SelectItem value="graos">Grãos</SelectItem>
+            <SelectItem value="cafeicultura">Cafeicultura</SelectItem>
+            <SelectItem value="apículas">Apículas</SelectItem>
+            <SelectItem value="laticínios">Laticínios</SelectItem>
+            <SelectItem value="aveicultura">Aveicultura</SelectItem>
+            <SelectItem value="suinocultura">Suinocultura</SelectItem>
+            <SelectItem value="bovino">Bovinocultura</SelectItem>
+            <SelectItem value="ovinocultura">Ovinocultura</SelectItem>
+            <SelectItem value="fruticultura">Fruticultura</SelectItem>
+            <SelectItem value="outros">Outros</SelectItem>
+          </SelectContent>
+        </Select>
+        {formData.secCrop === 'outros' && (
+          <Input
+            id="secCropOther"
+            type="text"
+            value={formData.secCropOther}
+            onChange={(e) => handleInputChange('secCropOther', e.target.value)}
+            placeholder="Especifique o seguimento secundário"
+          />
+        )}
       </div>
     </div>
   );
@@ -402,12 +424,12 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="additionalInfo">Informações Adicionais</Label>
+        <Label htmlFor="additionalInfo">Nome da propiedade</Label>
         <Textarea
           id="additionalInfo"
           value={formData.additionalInfo}
           onChange={(e) => handleInputChange('additionalInfo', e.target.value)}
-          placeholder="Informações complementares sobre a propriedade"
+          placeholder="Inserir nome do espaço ou propiedade rural"
         />
       </div>
     </div>
