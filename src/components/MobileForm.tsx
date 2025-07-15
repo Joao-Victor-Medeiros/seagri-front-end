@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MapPin, User, Mail, Phone, ChevronLeft, ChevronRight, Building2, MapIcon, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,29 +9,36 @@ import { useToast } from '@/hooks/use-toast';
 import { MapComponent } from './MapComponent';
 
 interface FormData {
-  // Informações Pessoais
+  // Informações Pessoais (Etapa 1)
   name: string;
   email: string;
   phone: string;
   cpf: string;
 
-  // Perfil da Produção
+  // Perfil da Produção (Etapa 2)
   propertySize: string;
+  productionType: string;
   mainCrop: string;
-  mainCropOther: string;
   secCrop: string;
   secCropOther: string;
-  productionType: string;
-  harvestPeriod: string;
 
-  // Endereço Rural Digital
-  latitude: number | null;
-  longitude: number | null;
+  // Produtos (Etapa 2)
+  products: {
+    name: string;
+    quantity: string;
+    unit: string;
+    price: string;
+    harvestSeason: string;
+  }[];
+
+  // Endereço Rural Digital (Etapa 3)
   ruralAddress: string;
   municipality: string;
   state: string;
   cep: string;
   additionalInfo: string;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 interface MobileFormProps {
@@ -46,29 +52,30 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState<Step>('personal');
   const [formData, setFormData] = useState<FormData>({
-    // Informações Pessoais
+    // Informações Pessoais (Etapa 1)
     name: '',
     email: '',
     phone: '',
     cpf: '',
 
-    // Perfil da Produção
+    // Perfil da Produção (Etapa 2)
     propertySize: '',
+    productionType: '',
     mainCrop: '',
-    mainCropOther: '',
     secCrop: '',
     secCropOther: '',
-    productionType: '',
-    harvestPeriod: '',
 
-    // Endereço Rural Digital
-    latitude: null,
-    longitude: null,
+    // Produtos (Etapa 2)
+    products: [],
+
+    // Endereço Rural Digital (Etapa 3)
     ruralAddress: '',
     municipality: '',
     state: '',
     cep: '',
-    additionalInfo: ''
+    additionalInfo: '',
+    latitude: null,
+    longitude: null
   });
 
   const handleInputChange = (field: keyof FormData, value: string) => {
@@ -78,13 +85,41 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
     }));
   };
 
+  const addProduct = () => {
+    setFormData(prev => ({
+      ...prev,
+      products: [...prev.products, {
+        name: '',
+        quantity: '',
+        unit: 'kg',
+        price: '',
+        harvestSeason: ''
+      }]
+    }));
+  };
+
+  const removeProduct = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      products: prev.products.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateProduct = (index: number, field: keyof FormData['products'][0], value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      products: prev.products.map((product, i) =>
+        i === index ? { ...product, [field]: value } : product
+      )
+    }));
+  };
+
   const validateStep = (step: Step): boolean => {
     switch (step) {
       case 'personal':
         return !!(formData.name && formData.email && formData.phone && formData.cpf);
       case 'production':
-        const hasMainCrop = formData.mainCrop && (formData.mainCrop !== 'outros' || formData.mainCropOther);
-        return !!(formData.propertySize && hasMainCrop && formData.productionType);
+        return !!(formData.propertySize && formData.mainCrop && formData.productionType);
       case 'location':
         return !!(selectedLocation && formData.ruralAddress && formData.municipality && formData.state);
       default:
@@ -135,13 +170,49 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
       return;
     }
 
+    // Organizando dados por ordem de preenchimento
     const submitData = {
-      ...formData,
-      latitude: selectedLocation.lat,
-      longitude: selectedLocation.lng
+      // Etapa 1: Informações Pessoais
+      informacoesPessoais: {
+        nome: formData.name,
+        email: formData.email,
+        telefone: formData.phone,
+        cpf: formData.cpf
+      },
+
+      // Etapa 2: Perfil da Produção
+      perfilProducao: {
+        tamanhoPropriedade: formData.propertySize,
+        regimeProducao: formData.productionType,
+        seguimentoPrincipal: formData.mainCrop,
+        seguimentoSecundario: formData.secCrop || null,
+        seguimentoSecundarioOutros: formData.secCropOther || null
+      },
+
+      // Etapa 2: Produtos
+      produtos: formData.products.map(product => ({
+        nome: product.name,
+        quantidade: product.quantity,
+        unidade: product.unit,
+        preco: product.price,
+        safra: product.harvestSeason
+      })),
+
+      // Etapa 3: Endereço Rural Digital
+      enderecoRural: {
+        endereco: formData.ruralAddress,
+        municipio: formData.municipality,
+        estado: formData.state,
+        cep: formData.cep || null,
+        nomePropriedade: formData.additionalInfo || null,
+        coordenadas: {
+          latitude: selectedLocation.lat,
+          longitude: selectedLocation.lng
+        }
+      }
     };
 
-    console.log('Form submitted:', submitData);
+    console.log('Formulário enviado:', submitData);
 
     toast({
       title: "Formulário enviado!",
@@ -276,19 +347,8 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
             <SelectItem value="bovino">Bovinocultura</SelectItem>
             <SelectItem value="ovinocultura">Ovinocultura</SelectItem>
             <SelectItem value="fruticultura">Fruticultura</SelectItem>
-            <SelectItem value="outros">Outros</SelectItem>
           </SelectContent>
         </Select>
-        {formData.mainCrop === 'outros' && (
-          <Input
-            id="mainCropOther"
-            type="text"
-            value={formData.mainCropOther}
-            onChange={(e) => handleInputChange('mainCropOther', e.target.value)}
-            placeholder="Especifique o seguimento principal"
-            required
-          />
-        )}
       </div>
 
       <div className="space-y-2">
@@ -321,6 +381,105 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
             placeholder="Especifique o seguimento secundário"
           />
         )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="products">Produtos de retorno</Label>
+        <div className="space-y-4">
+          {formData.products.map((product, index) => (
+            <div key={index} className="p-4 bg-muted rounded-lg">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+                <h3 className="text-lg font-semibold text-foreground">
+                  Produto {index + 1}
+                </h3>
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  onClick={() => removeProduct(index)}
+                  className="ml-auto"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor={`productName_${index}`}>Nome do Produto *</Label>
+                  <Input
+                    id={`productName_${index}`}
+                    type="text"
+                    value={product.name}
+                    onChange={(e) => updateProduct(index, 'name', e.target.value)}
+                    placeholder="Nome do produto"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor={`productQuantity_${index}`}>Quantidade *</Label>
+                  <Input
+                    id={`productQuantity_${index}`}
+                    type="number"
+                    value={product.quantity}
+                    onChange={(e) => updateProduct(index, 'quantity', e.target.value)}
+                    placeholder="Ex: 100"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor={`productUnit_${index}`}>Unidade *</Label>
+                  <Select value={product.unit} onValueChange={(value) => updateProduct(index, 'unit', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione a unidade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="kg">Quilogramas (kg)</SelectItem>
+                      <SelectItem value="g">Gramas (g)</SelectItem>
+                      <SelectItem value="l">Litros (L)</SelectItem>
+                      <SelectItem value="m">Metros (m)</SelectItem>
+                      <SelectItem value="un">Unidades (un)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor={`productPrice_${index}`}>Preço *</Label>
+                  <Input
+                    id={`productPrice_${index}`}
+                    type="text"
+                    value={product.price}
+                    onChange={(e) => updateProduct(index, 'price', e.target.value)}
+                    placeholder="Preço por unidade"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor={`productHarvestSeason_${index}`}>Safra/Período produção</Label>
+                  <Input
+                    id={`productHarvestSeason_${index}`}
+                    type="text"
+                    value={product.harvestSeason}
+                    onChange={(e) => updateProduct(index, 'harvestSeason', e.target.value)}
+                    placeholder="Ex: 2023/2024"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+
+          <Button
+            type="button"
+            onClick={addProduct}
+            className="w-full sm:w-auto"
+          >
+            Adicionar
+          </Button>
+        </div>
       </div>
     </div>
   );
