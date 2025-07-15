@@ -21,6 +21,7 @@ interface FormData {
   mainCrop: string;
   secCrop: string;
   secCropOther: string;
+  benefitProgram: string;
 
   // Produtos (Etapa 2)
   products: {
@@ -64,6 +65,7 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
     mainCrop: '',
     secCrop: '',
     secCropOther: '',
+    benefitProgram: '',
 
     // Produtos (Etapa 2)
     products: [],
@@ -186,17 +188,15 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
         regimeProducao: formData.productionType,
         seguimentoPrincipal: formData.mainCrop,
         seguimentoSecundario: formData.secCrop || null,
-        seguimentoSecundarioOutros: formData.secCropOther || null
+        programaSeagri: formData.benefitProgram || null,
+        produtos: formData.products.map(product => ({
+          nome: product.name,
+          quantidade: product.quantity,
+          unidade: product.unit,
+          preco: product.price,
+          safra: product.harvestSeason
+        }))
       },
-
-      // Etapa 2: Produtos
-      produtos: formData.products.map(product => ({
-        nome: product.name,
-        quantidade: product.quantity,
-        unidade: product.unit,
-        preco: product.price,
-        safra: product.harvestSeason
-      })),
 
       // Etapa 3: Endereço Rural Digital
       enderecoRural: {
@@ -480,6 +480,35 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
             Adicionar
           </Button>
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="benefitProgram">Escolha o programa ao qual você participa na Seagri</Label>
+        <Select
+          value={formData.benefitProgram}
+          onValueChange={(value) => handleInputChange("benefitProgram", value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Selecione o benefício" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="desconheco">Desconheço os programas</SelectItem>
+            <SelectItem value="papa">PAPA</SelectItem>
+            <SelectItem value="paa">PAA</SelectItem>
+            <SelectItem value="doacao-insumos">Doação de Insumos</SelectItem>
+            <SelectItem value="fomento-eventos">Fomento em eventos</SelectItem>
+            <SelectItem value="pro-rural">PRO-RURAL</SelectItem>
+            <SelectItem value="reflorestar">Reflorestar – Doação de Mudas Nativas</SelectItem>
+            <SelectItem value="alevinar">Alevinar – Doação de alevinos</SelectItem>
+            <SelectItem value="rota-fruticultura">Rota da Fruticultura</SelectItem>
+            <SelectItem value="porteira-pra-dentro">Serviços de maquinário – "Porteira Pra Dentro"</SelectItem>
+            <SelectItem value="produtor-agua">Produtor de Água – Pagamento por Serviços Ambientais</SelectItem>
+            <SelectItem value="cessao-maquinas">Cessão de uso de máquinas agrícolas</SelectItem>
+            <SelectItem value="fdr">FDR – Fundo de Desenvolvimento Rural</SelectItem>
+            <SelectItem value="dcaa">DCAA – Declaração de Conformidade de Atividade Agropecuária</SelectItem>
+            <SelectItem value="outros">Outro(s) detalhar a seguir</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );
