@@ -594,23 +594,6 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
         <MapComponent onLocationSelect={onLocationSelect} selectedLocation={selectedLocation} />
       </div>
 
-      <div className="p-4 bg-muted rounded-lg">
-        <div className="flex items-center gap-2 mb-2">
-          <MapPin className="h-4 w-4 text-primary" />
-          <span className="text-sm font-medium">Localização Selecionada</span>
-        </div>
-        {selectedLocation ? (
-          <p className="text-sm text-muted-foreground">
-            Lat: {selectedLocation.lat.toFixed(6)},
-            Lng: {selectedLocation.lng.toFixed(6)}
-          </p>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            Clique no mapa para selecionar uma localização
-          </p>
-        )}
-      </div>
-
       <div className="space-y-2">
         <Label htmlFor="additionalInfo">Nome da propiedade</Label>
         <Textarea
