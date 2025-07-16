@@ -1,8 +1,9 @@
-
-import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import React, { useEffect, useState, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-draw/dist/leaflet.draw.css';
+import 'leaflet-draw';
 
 // Fix para ícones do Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -15,6 +16,8 @@ L.Icon.Default.mergeOptions({
 interface MapComponentProps {
   onLocationSelect: (lat: number, lng: number) => void;
   selectedLocation: { lat: number; lng: number } | null;
+  onPolygonSelect?: (polygon: L.Polygon) => void;
+  selectedPolygon?: L.Polygon | null;
 }
 
 function MapClickHandler({ onLocationSelect }: { onLocationSelect: (lat: number, lng: number) => void }) {
@@ -27,7 +30,86 @@ function MapClickHandler({ onLocationSelect }: { onLocationSelect: (lat: number,
   return null;
 }
 
-export function MapComponent({ onLocationSelect, selectedLocation }: MapComponentProps) {
+function DrawControl({ onPolygonSelect }: { onPolygonSelect?: (polygon: L.Polygon) => void }) {
+  const map = useMap();
+  const drawnItemsRef = useRef<L.FeatureGroup>(new L.FeatureGroup());
+
+  useEffect(() => {
+    const drawnItems = drawnItemsRef.current;
+    map.addLayer(drawnItems);
+
+    // Configurar controles de desenho
+    const drawControl = new L.Control.Draw({
+      position: 'topright',
+      draw: {
+        polygon: {
+          allowIntersection: false, // Restricts shapes to simple polygons
+          drawError: {
+            color: '#e1e100', // Color the shape will turn when intersects
+            message: '<strong>Erro:</strong> não é possível desenhar linhas que se cruzam!' // Message that will show when intersect
+          },
+          shapeOptions: {
+            color: '#24aa72ff'
+          }
+        },
+        polyline: false,
+        circle: false,
+        circlemarker: false,
+        marker: false,
+        rectangle: false
+      },
+      edit: {
+        featureGroup: drawnItems, // REQUIRED!!
+        remove: true
+      }
+    });
+
+    map.addControl(drawControl);
+
+    // Event listeners para desenho
+    map.on(L.Draw.Event.CREATED, (e: any) => {
+      const { layerType, layer } = e;
+
+      if (layerType === 'polygon') {
+        // Limpar polígonos anteriores
+        drawnItems.clearLayers();
+
+        // Adicionar novo polígono
+        drawnItems.addLayer(layer);
+
+        // Callback para o componente pai
+        if (onPolygonSelect) {
+          onPolygonSelect(layer);
+        }
+      }
+    });
+
+    map.on(L.Draw.Event.EDITED, (e: any) => {
+      const layers = e.layers;
+      layers.eachLayer((layer: L.Polygon) => {
+        if (onPolygonSelect) {
+          onPolygonSelect(layer);
+        }
+      });
+    });
+
+    map.on(L.Draw.Event.DELETED, (e: any) => {
+      if (onPolygonSelect) {
+        onPolygonSelect(null as any);
+      }
+    });
+
+    // Cleanup
+    return () => {
+      map.removeControl(drawControl);
+      map.removeLayer(drawnItems);
+    };
+  }, [map, onPolygonSelect]);
+
+  return null;
+}
+
+export function MapComponent({ onLocationSelect, selectedLocation, onPolygonSelect }: MapComponentProps) {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
@@ -70,9 +152,10 @@ export function MapComponent({ onLocationSelect, selectedLocation }: MapComponen
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        
+
         <MapClickHandler onLocationSelect={onLocationSelect} />
-        
+        <DrawControl onPolygonSelect={onPolygonSelect} />
+
         {selectedLocation && (
           <Marker position={[selectedLocation.lat, selectedLocation.lng]}>
             <Popup>
