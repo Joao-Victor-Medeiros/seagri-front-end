@@ -155,19 +155,6 @@ export function MapComponent({ onLocationSelect, selectedLocation, onPolygonSele
 
         <MapClickHandler onLocationSelect={onLocationSelect} />
         <DrawControl onPolygonSelect={onPolygonSelect} />
-
-        {selectedLocation && (
-          <Marker position={[selectedLocation.lat, selectedLocation.lng]}>
-            <Popup>
-              <div className="text-center">
-                <p className="font-medium">Localização Selecionada</p>
-                <p className="text-sm text-gray-600">
-                  {selectedLocation.lat.toFixed(6)}, {selectedLocation.lng.toFixed(6)}
-                </p>
-              </div>
-            </Popup>
-          </Marker>
-        )}
       </MapContainer>
     </div>
   );
