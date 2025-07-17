@@ -79,6 +79,7 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
     latitude: null,
     longitude: null
   });
+  const [polygonCoordinates, setPolygonCoordinates] = useState<{ lat: number; lng: number }[]>([]);
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({
@@ -209,7 +210,10 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
           latitude: selectedLocation.lat,
           longitude: selectedLocation.lng
         }
-      }
+      },
+
+      // Coordenadas do polígono
+      coordenadasPoligono: polygonCoordinates
     };
 
     console.log('Formulário enviado:', submitData);
@@ -591,7 +595,11 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
 
       <div className="space-y-2">
         <Label htmlFor="map">Localização no Mapa *</Label>
-        <MapComponent onLocationSelect={onLocationSelect} selectedLocation={selectedLocation} />
+        <MapComponent
+          onLocationSelect={onLocationSelect}
+          selectedLocation={selectedLocation}
+          onPolygonSelect={handlePolygonSelect}
+        />
       </div>
 
       <div className="space-y-2">
@@ -605,6 +613,17 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
       </div>
     </div>
   );
+
+  const handlePolygonSelect = (polygon: L.Polygon | null) => {
+    if (polygon) {
+      const latlngs = polygon.getLatLngs()[0] as L.LatLng[];
+      const coords = latlngs.map(pt => ({ lat: pt.lat, lng: pt.lng }));
+      setPolygonCoordinates(coords);
+      console.log("Polígono:", coords);
+    } else {
+      setPolygonCoordinates([]);
+    }
+  };
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center p-4">

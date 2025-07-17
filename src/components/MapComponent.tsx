@@ -30,74 +30,78 @@ function MapClickHandler({ onLocationSelect }: { onLocationSelect: (lat: number,
   return null;
 }
 
-function DrawControl({ onPolygonSelect }: { onPolygonSelect?: (polygon: L.Polygon) => void }) {
+function DrawControl({ onPolygonSelect }: { onPolygonSelect?: (polygon: L.Polygon | null) => void }) {
   const map = useMap();
-  const drawnItemsRef = useRef<boolean>(false);
+  const drawnFlagRef = useRef<boolean>(false);
+  // Ref para armazenar o controle e evitar múltiplas instâncias
+  const controlRef = useRef<L.Control.Draw | null>(null);
 
   useEffect(() => {
-    // Configurar controles de desenho
-    const drawControl = new L.Control.Draw({
-      position: 'topright',
-      draw: {
-        polygon: {
-          allowIntersection: false, // Restricts shapes to simple polygons
-          drawError: {
-            color: '#e1e100', // Color the shape will turn when intersects
-            message: '<strong>Erro:</strong> não é possível desenhar linhas que se cruzam!' // Message that will show when intersect
+    if (!map) return;
+
+    // Cria e adiciona o controle apenas uma vez
+    if (!controlRef.current) {
+      controlRef.current = new L.Control.Draw({
+        position: 'topright',
+        draw: {
+          polygon: {
+            allowIntersection: false,
+            drawError: {
+              color: '#e1e100',
+              message: '<strong>Erro:</strong> não é possível desenhar linhas que se cruzam!'
+            },
+            shapeOptions: {
+              color: '#24aa72ff'
+            }
           },
-          shapeOptions: {
-            color: '#24aa72ff'
-          }
+          polyline: false,
+          circle: false,
+          circlemarker: false,
+          marker: false,
+          rectangle: false
         },
-        polyline: false,
-        circle: false,
-        circlemarker: false,
-        marker: false,
-        rectangle: false
-      },
-      edit: {
-        featureGroup: L.featureGroup().addTo(map), // REQUIRED!!
-        remove: true
-      }
-    });
-
-    map.addControl(drawControl);
-
-    // Event listeners para desenho
-    map.on(L.Draw.Event.CREATED, (e: any) => {
-      if (drawnItemsRef.current) return; // impede múltiplos
-
-      const { layerType, layer } = e;
-
-      if (layerType === 'polygon') {
-        map.addLayer(layer); // mostra no mapa
-
-        const latlngs = layer.getLatLngs()[0]; // pega os pontos
-        const vertices = latlngs.map((point: L.LatLng) => [point.lat, point.lng]);
-
-        console.log('Coordenadas do polígono:', vertices);
-        drawnItemsRef.current = true;
-      }
-    });
-
-    map.on(L.Draw.Event.EDITED, (e: any) => {
-      const layers = e.layers;
-      layers.eachLayer((layer: L.Polygon) => {
-        if (onPolygonSelect) {
-          onPolygonSelect(layer);
+        edit: {
+          featureGroup: L.featureGroup().addTo(map),
+          remove: true
         }
       });
-    });
 
-    map.on(L.Draw.Event.DELETED, (e: any) => {
-      if (onPolygonSelect) {
-        onPolygonSelect(null as any);
+      map.addControl(controlRef.current);
+    }
+
+    // Evento de criação do desenho
+    const handleCreated = (e: any) => {
+      if (drawnFlagRef.current) return; // impede múltiplos
+
+      const { layerType, layer } = e;
+      if (layerType === 'polygon') {
+        map.addLayer(layer);
+        const latlngs = layer.getLatLngs()[0] as L.LatLng[];
+        console.log('Coordenadas do polígono:', latlngs.map(point => [point.lat, point.lng]));
+        drawnFlagRef.current = true;
+        if (onPolygonSelect) onPolygonSelect(layer);
       }
-    });
+    };
 
-    // Cleanup
+    const handleEdited = (e: any) => {
+      e.layers.eachLayer((layer: L.Polygon) => {
+        if (onPolygonSelect) onPolygonSelect(layer);
+      });
+    };
+
+    const handleDeleted = (_e: any) => {
+      if (onPolygonSelect) onPolygonSelect(null);
+      drawnFlagRef.current = false;
+    };
+
+    map.on(L.Draw.Event.CREATED, handleCreated);
+    map.on(L.Draw.Event.EDITED, handleEdited);
+    map.on(L.Draw.Event.DELETED, handleDeleted);
+
     return () => {
-      map.removeControl(drawControl);
+      map.off(L.Draw.Event.CREATED, handleCreated);
+      map.off(L.Draw.Event.EDITED, handleEdited);
+      map.off(L.Draw.Event.DELETED, handleDeleted);
     };
   }, [map, onPolygonSelect]);
 
