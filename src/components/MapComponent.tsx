@@ -32,12 +32,9 @@ function MapClickHandler({ onLocationSelect }: { onLocationSelect: (lat: number,
 
 function DrawControl({ onPolygonSelect }: { onPolygonSelect?: (polygon: L.Polygon) => void }) {
   const map = useMap();
-  const drawnItemsRef = useRef<L.FeatureGroup>(new L.FeatureGroup());
+  const drawnItemsRef = useRef<boolean>(false);
 
   useEffect(() => {
-    const drawnItems = drawnItemsRef.current;
-    map.addLayer(drawnItems);
-
     // Configurar controles de desenho
     const drawControl = new L.Control.Draw({
       position: 'topright',
@@ -59,7 +56,7 @@ function DrawControl({ onPolygonSelect }: { onPolygonSelect?: (polygon: L.Polygo
         rectangle: false
       },
       edit: {
-        featureGroup: drawnItems, // REQUIRED!!
+        featureGroup: L.featureGroup().addTo(map), // REQUIRED!!
         remove: true
       }
     });
@@ -68,19 +65,18 @@ function DrawControl({ onPolygonSelect }: { onPolygonSelect?: (polygon: L.Polygo
 
     // Event listeners para desenho
     map.on(L.Draw.Event.CREATED, (e: any) => {
+      if (drawnItemsRef.current) return; // impede múltiplos
+
       const { layerType, layer } = e;
 
       if (layerType === 'polygon') {
-        // Limpar polígonos anteriores
-        drawnItems.clearLayers();
+        map.addLayer(layer); // mostra no mapa
 
-        // Adicionar novo polígono
-        drawnItems.addLayer(layer);
+        const latlngs = layer.getLatLngs()[0]; // pega os pontos
+        const vertices = latlngs.map((point: L.LatLng) => [point.lat, point.lng]);
 
-        // Callback para o componente pai
-        if (onPolygonSelect) {
-          onPolygonSelect(layer);
-        }
+        console.log('Coordenadas do polígono:', vertices);
+        drawnItemsRef.current = true;
       }
     });
 
@@ -102,7 +98,6 @@ function DrawControl({ onPolygonSelect }: { onPolygonSelect?: (polygon: L.Polygo
     // Cleanup
     return () => {
       map.removeControl(drawControl);
-      map.removeLayer(drawnItems);
     };
   }, [map, onPolygonSelect]);
 
