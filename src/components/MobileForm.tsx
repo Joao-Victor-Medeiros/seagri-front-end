@@ -52,6 +52,7 @@ type Step = 'personal' | 'production' | 'location';
 export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormProps) {
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState<Step>('personal');
+  const [polygonGeoJSON, setPolygonGeoJSON] = useState<any>(null);
   const [formData, setFormData] = useState<FormData>({
     // Informações Pessoais (Etapa 1)
     name: '',
@@ -161,6 +162,28 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
     }
   };
 
+  // Função para gerar GeoJSON a partir das coordenadas (sem interface de download)
+  const generateGeoJSON = (coords: { lat: number; lng: number }[]) => {
+    if (!coords || coords.length === 0) return null;
+
+    // Criar um GeoJSON do tipo Polygon
+    return {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          coords.map(point => [point.lng, point.lat]).concat([
+            [coords[0].lng, coords[0].lat] // Fechar o polígono repetindo o primeiro ponto
+          ])
+        ]
+      },
+      properties: {
+        created_at: new Date().toISOString(),
+        source: "mobile-map-form"
+      }
+    };
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -206,14 +229,8 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
         estado: formData.state,
         cep: formData.cep || null,
         nomePropriedade: formData.additionalInfo || null,
-        coordenadas: {
-          latitude: selectedLocation.lat,
-          longitude: selectedLocation.lng
-        }
-      },
-
-      // Coordenadas do polígono
-      coordenadasPoligono: polygonCoordinates
+        coordenadas: polygonGeoJSON
+      }
     };
 
     console.log('Formulário enviado:', submitData);
@@ -600,6 +617,14 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
           selectedLocation={selectedLocation}
           onPolygonSelect={handlePolygonSelect}
         />
+
+        {polygonCoordinates.length > 0 && (
+          <div className="mt-2">
+            <p className="text-sm text-muted-foreground">
+              Polígono definido com {polygonCoordinates.length} pontos.
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -619,9 +644,17 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
       const latlngs = polygon.getLatLngs()[0] as L.LatLng[];
       const coords = latlngs.map(pt => ({ lat: pt.lat, lng: pt.lng }));
       setPolygonCoordinates(coords);
-      console.log("Polígono:", coords);
+
+      // Gerar GeoJSON a partir das coordenadas
+      const geoJsonPolygon = generateGeoJSON(coords);
+      setPolygonGeoJSON(geoJsonPolygon);
+
+      // Log apenas para desenvolvimento
+      console.log("Coordenadas do polígono:", coords);
+      console.log("Polígono GeoJSON:", JSON.stringify(geoJsonPolygon));
     } else {
       setPolygonCoordinates([]);
+      setPolygonGeoJSON(null);
     }
   };
 
