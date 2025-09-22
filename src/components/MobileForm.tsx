@@ -26,10 +26,10 @@ interface FormData {
   // Produtos (Etapa 2)
   products: {
     name: string;
+    expiry: string;
     quantity: string;
     unit: string;
     price: string;
-    harvestSeason: string;
   }[];
 
   // Endereço Rural Digital (Etapa 3)
@@ -94,10 +94,10 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
       ...prev,
       products: [...prev.products, {
         name: '',
-        quantity: '',
-        unit: 'kg',
-        price: '',
-        harvestSeason: ''
+        expiry: '',
+        quantity: '0',
+        unit: 'Kg',
+        price: '0'
       }]
     }));
   };
@@ -215,10 +215,10 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
         programaSeagri: formData.benefitProgram || null,
         produtos: formData.products.map(product => ({
           nome: product.name,
+          validade: product.expiry,
           quantidade: product.quantity,
           unidade: product.unit,
-          preco: product.price,
-          safra: product.harvestSeason
+          preco: product.price
         }))
       },
 
@@ -427,7 +427,7 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor={`productName_${index}`}>Nome do Produto *</Label>
+                  <Label htmlFor={`productName_${index}`}>Nome do Produto</Label>
                   <Input
                     id={`productName_${index}`}
                     type="text"
@@ -439,53 +439,57 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor={`productQuantity_${index}`}>Quantidade *</Label>
+                  <Label htmlFor={`productExpiry_${index}`}>Validade</Label>
                   <Input
-                    id={`productQuantity_${index}`}
-                    type="number"
-                    value={product.quantity}
-                    onChange={(e) => updateProduct(index, 'quantity', e.target.value)}
-                    placeholder="Ex: 100"
+                    id={`productExpiry_${index}`}
+                    type="text"
+                    value={product.expiry}
+                    onChange={(e) => updateProduct(index, 'expiry', e.target.value)}
+                    placeholder="dd / mm / aaaa"
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor={`productUnit_${index}`}>Unidade *</Label>
-                  <Select value={product.unit} onValueChange={(value) => updateProduct(index, 'unit', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione a unidade" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="kg">Quilogramas (kg)</SelectItem>
-                      <SelectItem value="g">Gramas (g)</SelectItem>
-                      <SelectItem value="l">Litros (L)</SelectItem>
-                      <SelectItem value="m">Metros (m)</SelectItem>
-                      <SelectItem value="un">Unidades (un)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor={`productQuantity_${index}`}>Quantidade</Label>
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      id={`productQuantity_${index}`}
+                      type="number"
+                      value={product.quantity}
+                      onChange={(e) => updateProduct(index, 'quantity', e.target.value)}
+                      placeholder="0"
+                      required
+                      className="flex-grow"
+                    />
+                    <div className="w-32">
+                      <Select
+                        value={product.unit}
+                        onValueChange={(value) => updateProduct(index, 'unit', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Kg" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Kg">Kg</SelectItem>
+                          <SelectItem value="Tonelada">Tonelada</SelectItem>
+                          <SelectItem value="Unidade">Unidade</SelectItem>
+                          <SelectItem value="Caixa">Caixa</SelectItem>
+                          <SelectItem value="Cabeça">Cabeça</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor={`productPrice_${index}`}>Preço *</Label>
+                  <Label htmlFor={`productPrice_${index}`}>Valor (R$)</Label>
                   <Input
                     id={`productPrice_${index}`}
-                    type="text"
+                    type="number"
                     value={product.price}
                     onChange={(e) => updateProduct(index, 'price', e.target.value)}
-                    placeholder="Preço por unidade"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor={`productHarvestSeason_${index}`}>Safra/Período produção</Label>
-                  <Input
-                    id={`productHarvestSeason_${index}`}
-                    type="text"
-                    value={product.harvestSeason}
-                    onChange={(e) => updateProduct(index, 'harvestSeason', e.target.value)}
-                    placeholder="Ex: 2023/2024"
+                    placeholder="0"
                     required
                   />
                 </div>
