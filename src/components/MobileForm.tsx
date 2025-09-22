@@ -33,11 +33,10 @@ interface FormData {
   }[];
 
   // Endereço Rural Digital (Etapa 3)
-  ruralAddress: string;
   municipality: string;
   state: string;
   cep: string;
-  additionalInfo: string;
+  propertyName: string;
   latitude: number | null;
   longitude: number | null;
 }
@@ -72,11 +71,10 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
     products: [],
 
     // Endereço Rural Digital (Etapa 3)
-    ruralAddress: '',
     municipality: '',
     state: '',
     cep: '',
-    additionalInfo: '',
+    propertyName: '',
     latitude: null,
     longitude: null
   });
@@ -125,7 +123,7 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
       case 'production':
         return !!(formData.propertySize && formData.mainCrop && formData.productionType);
       case 'location':
-        return !!(selectedLocation && formData.ruralAddress && formData.municipality && formData.state);
+        return !!(selectedLocation && formData.propertyName && formData.municipality && formData.state);
       default:
         return false;
     }
@@ -224,11 +222,10 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
 
       // Etapa 3: Endereço Rural Digital
       enderecoRural: {
-        endereco: formData.ruralAddress,
+        nomePropriedade: formData.propertyName,
         municipio: formData.municipality,
         estado: formData.state,
         cep: formData.cep || null,
-        nomePropriedade: formData.additionalInfo || null,
         coordenadas: polygonGeoJSON
       }
     };
@@ -541,12 +538,12 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
   const renderLocationInfo = () => (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="ruralAddress">Endereço Rural *</Label>
+        <Label htmlFor="propertyName">Nome da propriedade *</Label>
         <Textarea
-          id="ruralAddress"
-          value={formData.ruralAddress}
-          onChange={(e) => handleInputChange('ruralAddress', e.target.value)}
-          placeholder="Endereço completo da propriedade rural"
+          id="propertyName"
+          value={formData.propertyName}
+          onChange={(e) => handleInputChange('propertyName', e.target.value)}
+          placeholder="Inserir nome do espaço ou propriedade rural"
           required
         />
       </div>
@@ -629,16 +626,6 @@ export function MobileForm({ onLocationSelect, selectedLocation }: MobileFormPro
             </p>
           </div>
         )}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="additionalInfo">Nome da propiedade</Label>
-        <Textarea
-          id="additionalInfo"
-          value={formData.additionalInfo}
-          onChange={(e) => handleInputChange('additionalInfo', e.target.value)}
-          placeholder="Inserir nome do espaço ou propiedade rural"
-        />
       </div>
     </div>
   );
