@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { SectionBaseProps } from "@/componentes/mobile-form/types";
+import type { SectionBaseProps } from "@/components/forms/mobile-form/types";
 import styles from "./personal-info.module.css";
 
 export const PersonalInfoSection = ({ formData, setFieldValue }: SectionBaseProps) => {

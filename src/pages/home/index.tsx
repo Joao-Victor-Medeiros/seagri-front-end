@@ -1,4 +1,4 @@
-import { MobileForm } from "@/componentes/mobile-form";
+import { MobileForm } from "@/components/forms/mobile-form";
 import styles from "./home.module.css";
 
 const HomePage = () => {

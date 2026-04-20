@@ -1,8 +1,8 @@
-import { PersonalInfoSection } from "@/componentes/mobile-form/sections/personal-info";
-import { ProductionProfileSection } from "@/componentes/mobile-form/sections/production-profile";
-import { LocationInfoSection } from "@/componentes/mobile-form/sections/location-info";
-import { StepHeader } from "@/componentes/mobile-form/step-header";
-import { StepNavigation } from "@/componentes/mobile-form/step-navigation";
+import { PersonalInfoSection } from "./sections/personal-info";
+import { ProductionProfileSection } from "./sections/production-profile";
+import { LocationInfoSection } from "./sections/location-info";
+import { StepHeader } from "./step-header";
+import { StepNavigation } from "./step-navigation";
 import { useFarmerForm } from "@/hooks/form/use-farmer-form";
 import styles from "./mobile-form.module.css";
 

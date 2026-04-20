@@ -1,4 +1,4 @@
-import { MapComponent as NewMapComponent } from "@/componentes/map";
+import { MapComponent as NewMapComponent } from "./map";
 
 export interface MapComponentProps {
   onLocationSelect?: (lat: number, lng: number) => void;

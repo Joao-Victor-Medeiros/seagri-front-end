@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { ProductionSectionProps } from "@/componentes/mobile-form/types";
+import type { ProductionSectionProps } from "@/components/forms/mobile-form/types";
 import styles from "./production-profile.module.css";
 
 export const ProductionProfileSection = ({
@@ -105,7 +105,7 @@ export const ProductionProfileSection = ({
         <Label htmlFor="products">Produtos de retorno</Label>
         <div className={styles.productList}>
           {formData.products.map((product, index) => (
-            <div key={`${product.name}-${index}`} className={styles.productCard}>
+            <div key={index} className={styles.productCard}>
               <div className={styles.productHeader}>
                 <h3>Produto {index + 1}</h3>
                 <Button variant="destructive" size="icon" onClick={() => removeProduct(index)}>
