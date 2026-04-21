@@ -1,4 +1,4 @@
-import { MobileForm as NewMobileForm } from "./forms/mobile-form";
+import { MobileForm as NewMobileForm } from "@/components/forms/mobile-form";
 
 export interface MobileFormProps {
   onLocationSelect?: (lat: number, lng: number) => void;
