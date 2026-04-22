@@ -5,7 +5,7 @@ import { MapComponent } from "@/components/map";
 import { RootProvider } from "@/state/root-provider";
 
 describe("MapComponent", () => {
-	it("deve renderizar o componente de mapa para o usuario (AAA, sem mocks)", async () => {
+	it("deve renderizar o componente de mapa leaflet para o usuario", async () => {
 		// Arrange
 		const tree = createElement(RootProvider, null, createElement(MapComponent));
 
