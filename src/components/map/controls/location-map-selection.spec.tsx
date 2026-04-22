@@ -22,7 +22,7 @@ jest.mock("@/state/map/map-context", () => ({
 }));
 
 describe("useMapDrawing - selecao de poligono", () => {
-	it("deve gerar GeoJSON com coordenadas validas e faixa correta de lat/lng (AAA)", () => {
+	it("deve gerar GeoJSON com coordenadas validas e faixa correta de lat/lng", () => {
 		// Arrange
 		dispatchMock.mockClear();
 		const polygon = {

@@ -1,11 +1,16 @@
 import type L from "leaflet";
 import { useMapContext } from "@/state/map/map-context";
 import { generateGeoJSON } from "@/utils/geojson";
+import { isWithinDistritoFederalBoundingBox } from "@/utils/map-bounds";
 
 export const useMapDrawing = () => {
   const { state, dispatch } = useMapContext();
 
   const handleLocationSelect = (lat: number, lng: number) => {
+    if (!isWithinDistritoFederalBoundingBox({ lat, lng })) {
+      return;
+    }
+
     dispatch({
       type: "SET_SELECTED_LOCATION",
       payload: { lat, lng },

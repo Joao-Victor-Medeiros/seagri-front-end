@@ -3,6 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useFormContext } from "@/state/form/form-context";
 import { useMapContext } from "@/state/map/map-context";
 import { mapFormToSubmitPayload } from "@/utils/form-mapper";
+import { getProductExpiryValidationError } from "@/utils/form-validation";
 
 export const useFormSubmit = () => {
   const { toast } = useToast();
@@ -15,6 +16,17 @@ export const useFormSubmit = () => {
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
+
+    const expiryValidationError = getProductExpiryValidationError(formData);
+
+    if (expiryValidationError) {
+      toast({
+        title: "Validade invalida",
+        description: expiryValidationError,
+        variant: "destructive",
+      });
+      return;
+    }
 
     if (!selectedLocation) {
       toast({

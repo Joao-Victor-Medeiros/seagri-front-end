@@ -32,5 +32,5 @@
   },
   "include": [
     "src"
-  ]
+, "__mocks__/map-bounds.ts"  ]
 }

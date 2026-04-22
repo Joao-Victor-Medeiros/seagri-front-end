@@ -4,6 +4,7 @@ import { useMapContext } from "@/state/map/map-context";
 import { useFormStep } from "./use-form-step";
 import { useProductList } from "./use-product-list";
 import { useFormSubmit } from "./use-form-submit";
+import { getProductExpiryValidationError } from "@/utils/form-validation";
 
 export const useFarmerForm = () => {
   const { toast } = useToast();
@@ -18,6 +19,19 @@ export const useFarmerForm = () => {
   };
 
   const handleNextStep = () => {
+    if (currentStep === "production") {
+      const expiryValidationError = getProductExpiryValidationError(state.formData);
+
+      if (expiryValidationError) {
+        toast({
+          title: "Validade invalida",
+          description: expiryValidationError,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     if (!canProceed) {
       toast({
         title: "Campos obrigatorios",

@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { ProductionSectionProps } from "@/components/forms/mobile-form/types";
+import { formatExpiryDateInput, getExpiryInputValidationMessage } from "@/utils/form-validation";
 import styles from "./production-profile.module.css";
 
 export const ProductionProfileSection = ({
@@ -104,80 +105,90 @@ export const ProductionProfileSection = ({
       <div className={styles.field}>
         <Label htmlFor="products">Produtos de retorno</Label>
         <div className={styles.productList}>
-          {formData.products.map((product, index) => (
-            <div key={index} className={styles.productCard}>
-              <div className={styles.productHeader}>
-                <h3>Produto {index + 1}</h3>
-                <Button variant="destructive" size="icon" onClick={() => removeProduct(index)}>
-                  <X size={16} />
-                </Button>
-              </div>
+          {formData.products.map((product, index) => {
+            const expiryError = getExpiryInputValidationMessage(product.expiry);
 
-              <div className={styles.grid}>
-                <div className={styles.field}>
-                  <Label htmlFor={`productName_${index}`}>Nome do Produto</Label>
-                  <Input
-                    id={`productName_${index}`}
-                    type="text"
-                    value={product.name}
-                    onChange={(event) => updateProduct(index, "name", event.target.value)}
-                    placeholder="Nome do produto"
-                    required
-                  />
+            return (
+              <div key={index} className={styles.productCard}>
+                <div className={styles.productHeader}>
+                  <h3>Produto {index + 1}</h3>
+                  <Button variant="destructive" size="icon" onClick={() => removeProduct(index)}>
+                    <X size={16} />
+                  </Button>
                 </div>
 
-                <div className={styles.field}>
-                  <Label htmlFor={`productExpiry_${index}`}>Validade</Label>
-                  <Input
-                    id={`productExpiry_${index}`}
-                    type="text"
-                    value={product.expiry}
-                    onChange={(event) => updateProduct(index, "expiry", event.target.value)}
-                    placeholder="dd / mm / aaaa"
-                    required
-                  />
-                </div>
-
-                <div className={styles.field}>
-                  <Label htmlFor={`productQuantity_${index}`}>Quantidade</Label>
-                  <div className={styles.quantityRow}>
+                <div className={styles.grid}>
+                  <div className={styles.field}>
+                    <Label htmlFor={`productName_${index}`}>Nome do Produto</Label>
                     <Input
-                      id={`productQuantity_${index}`}
+                      id={`productName_${index}`}
+                      type="text"
+                      value={product.name}
+                      onChange={(event) => updateProduct(index, "name", event.target.value)}
+                      placeholder="Nome do produto"
+                      required
+                    />
+                  </div>
+
+                  <div className={styles.field}>
+                    <Label htmlFor={`productExpiry_${index}`}>Validade</Label>
+                    <Input
+                      id={`productExpiry_${index}`}
+                      type="text"
+                      value={product.expiry}
+                      onChange={(event) =>
+                        updateProduct(index, "expiry", formatExpiryDateInput(event.target.value))
+                      }
+                      inputMode="numeric"
+                      maxLength={10}
+                      placeholder="dd/mm/aaaa"
+                      aria-invalid={Boolean(expiryError)}
+                      required
+                    />
+                    {expiryError ? <p className={styles.errorText}>{expiryError}</p> : null}
+                  </div>
+
+                  <div className={styles.field}>
+                    <Label htmlFor={`productQuantity_${index}`}>Quantidade</Label>
+                    <div className={styles.quantityRow}>
+                      <Input
+                        id={`productQuantity_${index}`}
+                        type="number"
+                        value={product.quantity}
+                        onChange={(event) => updateProduct(index, "quantity", event.target.value)}
+                        placeholder="0"
+                        required
+                      />
+                      <Select value={product.unit} onValueChange={(value) => updateProduct(index, "unit", value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Kg" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Kg">Kg</SelectItem>
+                          <SelectItem value="Tonelada">Tonelada</SelectItem>
+                          <SelectItem value="Unidade">Unidade</SelectItem>
+                          <SelectItem value="Caixa">Caixa</SelectItem>
+                          <SelectItem value="Cabeca">Cabeca</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className={styles.field}>
+                    <Label htmlFor={`productPrice_${index}`}>Valor (R$)</Label>
+                    <Input
+                      id={`productPrice_${index}`}
                       type="number"
-                      value={product.quantity}
-                      onChange={(event) => updateProduct(index, "quantity", event.target.value)}
+                      value={product.price}
+                      onChange={(event) => updateProduct(index, "price", event.target.value)}
                       placeholder="0"
                       required
                     />
-                    <Select value={product.unit} onValueChange={(value) => updateProduct(index, "unit", value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Kg" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Kg">Kg</SelectItem>
-                        <SelectItem value="Tonelada">Tonelada</SelectItem>
-                        <SelectItem value="Unidade">Unidade</SelectItem>
-                        <SelectItem value="Caixa">Caixa</SelectItem>
-                        <SelectItem value="Cabeca">Cabeca</SelectItem>
-                      </SelectContent>
-                    </Select>
                   </div>
                 </div>
-
-                <div className={styles.field}>
-                  <Label htmlFor={`productPrice_${index}`}>Valor (R$)</Label>
-                  <Input
-                    id={`productPrice_${index}`}
-                    type="number"
-                    value={product.price}
-                    onChange={(event) => updateProduct(index, "price", event.target.value)}
-                    placeholder="0"
-                    required
-                  />
-                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           <Button type="button" onClick={addProduct}>
             Adicionar
