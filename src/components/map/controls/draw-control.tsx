@@ -9,14 +9,21 @@ interface DrawControlProps {
 
 export const DrawControl = ({ onPolygonSelect }: DrawControlProps) => {
   const map = useMap();
-  const drawnFlagRef = useRef(false);
   const controlRef = useRef<L.Control.Draw | null>(null);
+  const drawnItemsRef = useRef<L.FeatureGroup | null>(null);
 
   useEffect(() => {
     if (!map) {
       return;
     }
 
+    // Create feature group only once
+    if (!drawnItemsRef.current) {
+      drawnItemsRef.current = new L.FeatureGroup();
+      map.addLayer(drawnItemsRef.current);
+    }
+
+    // Create and add control only once
     if (!controlRef.current) {
       controlRef.current = new L.Control.Draw({
         position: "topright",
@@ -38,35 +45,43 @@ export const DrawControl = ({ onPolygonSelect }: DrawControlProps) => {
           rectangle: false,
         },
         edit: {
-          featureGroup: L.featureGroup().addTo(map),
+          featureGroup: drawnItemsRef.current,
           remove: true,
         },
       });
 
       map.addControl(controlRef.current);
+      (map as any).drawControl = controlRef.current;
     }
 
-    const handleCreated = (event: L.DrawEvents.Created) => {
-      if (drawnFlagRef.current) {
+    const syncPolygonSelection = () => {
+      const layers = drawnItemsRef.current?.getLayers() ?? [];
+      const polygons = layers.filter((layer): layer is L.Polygon => layer instanceof L.Polygon);
+
+      if (polygons.length === 0) {
+        onPolygonSelect(null);
         return;
       }
 
-      if (event.layerType === "polygon") {
-        map.addLayer(event.layer);
-        drawnFlagRef.current = true;
-        onPolygonSelect(event.layer as L.Polygon);
+      onPolygonSelect(polygons[polygons.length - 1]);
+    };
+
+    const handleCreated = (event: L.DrawEvents.Created) => {
+      console.log("Draw created:", event.layerType);
+      if (event.layerType === "polygon" && drawnItemsRef.current) {
+        drawnItemsRef.current.addLayer(event.layer);
+        syncPolygonSelection();
       }
     };
 
-    const handleEdited = (event: L.DrawEvents.Edited) => {
-      event.layers.eachLayer((layer: L.Layer) => {
-        onPolygonSelect(layer as L.Polygon);
-      });
+    const handleEdited = (_event: L.DrawEvents.Edited) => {
+      console.log("Draw edited");
+      syncPolygonSelection();
     };
 
-    const handleDeleted = () => {
-      onPolygonSelect(null);
-      drawnFlagRef.current = false;
+    const handleDeleted = (_event: L.DrawEvents.Deleted) => {
+      console.log("Draw deleted");
+      syncPolygonSelection();
     };
 
     map.on(L.Draw.Event.CREATED, handleCreated);

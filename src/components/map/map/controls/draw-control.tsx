@@ -69,14 +69,14 @@ export const DrawControl = ({ onPolygonSelect }: DrawControlProps) => {
       drawnFlagRef.current = false;
     };
 
-    map.on(L.Draw.Event.CREATED, handleCreated);
-    map.on(L.Draw.Event.EDITED, handleEdited);
-    map.on(L.Draw.Event.DELETED, handleDeleted);
+    map.on(L.Draw.Event.CREATED, handleCreated as L.LeafletEventHandlerFn);
+    map.on(L.Draw.Event.EDITED, handleEdited as L.LeafletEventHandlerFn);
+    map.on(L.Draw.Event.DELETED, handleDeleted as L.LeafletEventHandlerFn);
 
     return () => {
-      map.off(L.Draw.Event.CREATED, handleCreated);
-      map.off(L.Draw.Event.EDITED, handleEdited);
-      map.off(L.Draw.Event.DELETED, handleDeleted);
+      map.off(L.Draw.Event.CREATED, handleCreated as L.LeafletEventHandlerFn);
+      map.off(L.Draw.Event.EDITED, handleEdited as L.LeafletEventHandlerFn);
+      map.off(L.Draw.Event.DELETED, handleDeleted as L.LeafletEventHandlerFn);
     };
   }, [map, onPolygonSelect]);
 
