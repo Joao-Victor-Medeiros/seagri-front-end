@@ -3,7 +3,7 @@ import type { LatLngPoint } from "@/interfaces/map.interface";
 export const DISTRITO_FEDERAL_BOUNDING_BOX = {
     north: -15.48,
     south: -16.05,
-    east: -47.3,
+    east: -47.30,
     west: -48.28,
 } as const;
 

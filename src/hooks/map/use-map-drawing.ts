@@ -1,7 +1,7 @@
 import type L from "leaflet";
 import { useMapContext } from "@/state/map/map-context";
 import { generateGeoJSON } from "@/utils/geojson";
-import { isWithinDistritoFederalBoundingBox } from "@/utils/map-bounds";
+import { isWithinDistritoFederalBoundingBox, toFourDecimalPlaces } from "@/utils/map-bounds";
 
 export const useMapDrawing = () => {
   const { state, dispatch } = useMapContext();
@@ -25,9 +25,10 @@ export const useMapDrawing = () => {
     }
 
     const latlngs = polygon.getLatLngs()[0] as L.LatLng[];
-    
-    console.log("Selected polygon coordinates:", latlngs);
-    const coordinates = latlngs.map((point) => ({ lat: point.lat, lng: point.lng }));
+    const coordinates = latlngs.map((point) => ({
+      lat: toFourDecimalPlaces(point.lat),
+      lng: toFourDecimalPlaces(point.lng),
+    }));
 
     dispatch({ type: "SET_POLYGON_COORDINATES", payload: coordinates });
     dispatch({ type: "SET_POLYGON_GEOJSON", payload: generateGeoJSON(coordinates) });
