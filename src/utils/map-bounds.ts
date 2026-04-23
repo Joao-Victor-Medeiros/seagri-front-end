@@ -19,3 +19,7 @@ export const isWithinDistritoFederalBoundingBox = ({ lat, lng }: LatLngPoint): b
         lng >= DISTRITO_FEDERAL_BOUNDING_BOX.west
     );
 };
+
+export const toFourDecimalPlaces = (value: number): number => {
+    return Number(value.toFixed(4));
+};

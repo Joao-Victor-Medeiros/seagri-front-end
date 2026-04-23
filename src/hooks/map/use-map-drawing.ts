@@ -25,6 +25,8 @@ export const useMapDrawing = () => {
     }
 
     const latlngs = polygon.getLatLngs()[0] as L.LatLng[];
+    
+    console.log("Selected polygon coordinates:", latlngs);
     const coordinates = latlngs.map((point) => ({ lat: point.lat, lng: point.lng }));
 
     dispatch({ type: "SET_POLYGON_COORDINATES", payload: coordinates });
