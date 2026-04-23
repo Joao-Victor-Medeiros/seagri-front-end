@@ -1,0 +1,26 @@
+.wrapper {
+  width: 100%;
+  padding: 1rem;
+}
+
+.card {
+  width: 100%;
+  max-width: 64rem;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 12px 24px rgb(0 0 0 / 8%);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .card {
+    padding: 1.5rem;
+  }
+}

@@ -1,0 +1,27 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: hsl(var(--muted));
+}
+
+.card {
+  text-align: center;
+  background: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.75rem;
+  padding: 2rem;
+  box-shadow: 0 8px 16px rgb(0 0 0 / 10%);
+}
+
+.title {
+  margin: 0 0 0.75rem;
+  font-size: 2.25rem;
+}
+
+.link {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+}
