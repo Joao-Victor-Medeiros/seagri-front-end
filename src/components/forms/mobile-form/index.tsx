@@ -19,6 +19,7 @@ export const MobileForm = () => {
     handleNextStep,
     handlePreviousStep,
     handleSubmit,
+    isSubmitting,
   } = useFarmerForm();
 
   return (
@@ -52,6 +53,7 @@ export const MobileForm = () => {
           <StepNavigation
             currentStep={currentStep}
             canProceed={canProceed}
+            isSubmitting={isSubmitting}
             onPrevious={handlePreviousStep}
             onNext={handleNextStep}
           />

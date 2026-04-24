@@ -12,7 +12,7 @@ export const useFarmerForm = () => {
   const { state: mapState } = useMapContext();
   const { currentStep, canProceed, goToNext, goToPrevious } = useFormStep();
   const { addProduct, removeProduct, updateProduct } = useProductList();
-  const { handleSubmit } = useFormSubmit();
+  const { handleSubmit, isSubmitting } = useFormSubmit();
 
   const setFieldValue = (field: keyof typeof state.formData, value: string) => {
     dispatch({ type: "SET_FIELD", payload: { field, value } });
@@ -57,5 +57,6 @@ export const useFarmerForm = () => {
     handleNextStep,
     handlePreviousStep: goToPrevious,
     handleSubmit,
+    isSubmitting,
   };
 };
