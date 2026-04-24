@@ -1,5 +1,7 @@
 import type { FormEvent } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { submitFarmerForm } from "@/service/form-submit.service";
 import { useFormContext } from "@/state/form/form-context";
 import { useMapContext } from "@/state/map/map-context";
 import { mapFormToSubmitPayload } from "@/utils/form-mapper";
@@ -13,6 +15,23 @@ export const useFormSubmit = () => {
   const {
     state: { selectedLocation, polygonGeoJSON },
   } = useMapContext();
+
+  const submitMutation = useMutation({
+    mutationFn: submitFarmerForm,
+    onSuccess: () => {
+      toast({
+        title: "Formulario enviado!",
+        description: "Seus dados foram enviados com sucesso.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Falha no envio",
+        description: "Nao foi possivel enviar agora. Tente novamente.",
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -38,15 +57,11 @@ export const useFormSubmit = () => {
     }
 
     const submitPayload = mapFormToSubmitPayload(formData, polygonGeoJSON);
-    console.log("Formulario enviado:", submitPayload);
-
-    toast({
-      title: "Formulario enviado!",
-      description: "Seus dados foram enviados com sucesso.",
-    });
+    submitMutation.mutate(submitPayload);
   };
 
   return {
     handleSubmit,
+    isSubmitting: submitMutation.isPending,
   };
 };

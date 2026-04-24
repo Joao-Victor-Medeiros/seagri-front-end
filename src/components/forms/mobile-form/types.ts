@@ -23,6 +23,7 @@ export interface StepHeaderProps {
 export interface StepNavigationProps {
   currentStep: FormStep;
   canProceed: boolean;
+  isSubmitting: boolean;
   onPrevious: () => void;
   onNext: () => void;
 }

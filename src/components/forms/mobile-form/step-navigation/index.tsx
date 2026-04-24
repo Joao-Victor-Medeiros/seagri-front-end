@@ -6,6 +6,7 @@ import type { StepNavigationProps } from "../types";
 export const StepNavigation = ({
   currentStep,
   canProceed,
+  isSubmitting,
   onPrevious,
   onNext,
 }: StepNavigationProps) => {
@@ -15,7 +16,7 @@ export const StepNavigation = ({
         type="button"
         variant="outline"
         onClick={onPrevious}
-        disabled={currentStep === "personal"}
+        disabled={currentStep === "personal" || isSubmitting}
         className={styles.button}
       >
         <ChevronLeft size={16} />
@@ -23,12 +24,17 @@ export const StepNavigation = ({
       </Button>
 
       {currentStep === "location" ? (
-        <Button type="submit" disabled={!canProceed} className={styles.button}>
+        <Button type="submit" disabled={!canProceed || isSubmitting} className={styles.button}>
           <CheckCircle size={16} />
-          Enviar Formulario
+          {isSubmitting ? "Enviando..." : "Enviar Formulario"}
         </Button>
       ) : (
-        <Button type="button" onClick={onNext} disabled={!canProceed} className={styles.button}>
+        <Button
+          type="button"
+          onClick={onNext}
+          disabled={!canProceed || isSubmitting}
+          className={styles.button}
+        >
           Proximo
           <ChevronRight size={16} />
         </Button>
