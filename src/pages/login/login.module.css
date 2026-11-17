@@ -1,0 +1,92 @@
+.page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 1.5rem;
+  background-image:
+    linear-gradient(rgb(255 255 255 / 72%), rgb(255 255 255 / 72%)),
+    url("../../assets/Gemini_Generated_Image_vnozykvnozykvnoz.png");
+  background-position: center;
+  background-size: cover;
+}
+
+.card {
+  width: min(100%, 28rem);
+  padding: 2rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: 1rem;
+  background: hsl(var(--card));
+  box-shadow: 0 16px 48px rgb(15 23 42 / 12%);
+}
+
+.dfLogo {
+  display: block;
+  width: 4.5rem;
+  height: 5.25rem;
+  margin: 0 auto 1rem;
+  object-fit: contain;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #276343;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+.title {
+  margin: 0.5rem 0;
+  font-size: 1.75rem;
+  text-align: center;
+}
+
+.subtitle {
+  margin: 0;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.9375rem;
+  text-align: center;
+}
+
+.form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.error {
+  margin: 0;
+  color: hsl(var(--destructive));
+  font-size: 0.875rem;
+}
+
+.submit {
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.demoAccounts {
+  display: grid;
+  gap: 0.375rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid hsl(var(--border));
+  color: hsl(var(--muted-foreground));
+  font-size: 0.8125rem;
+}
+
+.demoAccounts strong {
+  color: hsl(var(--foreground));
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 1.5rem;
+  }
+}

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { FormProvider } from "@/state/form/form-provider";
 import { MapProvider } from "@/state/map/map-provider";
+import { AuthProvider } from "@/state/auth/auth-provider";
 
 interface RootProviderProps {
   children: ReactNode;
@@ -8,8 +9,10 @@ interface RootProviderProps {
 
 export const RootProvider = ({ children }: RootProviderProps) => {
   return (
-    <FormProvider>
-      <MapProvider>{children}</MapProvider>
-    </FormProvider>
+    <AuthProvider>
+      <FormProvider>
+        <MapProvider>{children}</MapProvider>
+      </FormProvider>
+    </AuthProvider>
   );
 };

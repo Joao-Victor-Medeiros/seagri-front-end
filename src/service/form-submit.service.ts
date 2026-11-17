@@ -1,6 +1,5 @@
 import type { FarmerSubmitPayload } from "@/interfaces/payload.interface";
-
-const FORM_ENDPOINT = "http://localhost:8080";
+import { API_BASE_URL } from "@/service/api-config";
 
 export interface submitResponse {
   id?: number;
@@ -10,7 +9,7 @@ export interface submitResponse {
 export const submitFarmerForm = async (
   payload: FarmerSubmitPayload,
 ): Promise<submitResponse> => {
-  const response = await fetch(FORM_ENDPOINT, {
+  const response = await fetch(API_BASE_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
