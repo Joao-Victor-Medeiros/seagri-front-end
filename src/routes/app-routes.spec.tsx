@@ -31,7 +31,7 @@ describe("rotas da aplicação", () => {
         </AuthProvider>,
       );
 
-      await user.type(screen.getByLabelText("Usuário"), "fernando");
+      await user.type(screen.getByLabelText("Usuário"), "admin");
       await user.type(screen.getByLabelText("Senha"), "123456");
       await user.click(screen.getByRole("button", { name: "Entrar" }));
 

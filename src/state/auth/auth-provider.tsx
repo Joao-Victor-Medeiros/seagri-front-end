@@ -8,7 +8,7 @@ export interface AuthUser {
 }
 
 const MOCK_USERS: Array<AuthUser & { password: string; active: boolean }> = [
-  { username: "fernando", password: "123456", role: "ADMIN", active: true },
+  { username: "admin", password: "123456", role: "ADMIN", active: true },
   {
     username: "Eduardo",
     password: "senhaforte123",

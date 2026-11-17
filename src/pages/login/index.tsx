@@ -101,7 +101,7 @@ const LoginPage = () => {
 
         <aside className={styles.demoAccounts} aria-label="Contas de demonstração">
           <strong>Acessos de demonstração</strong>
-          <span>fernando · 123456 · ADMIN</span>
+          <span>admin · 123456 · ADMIN</span>
         </aside>
       </section>
     </main>

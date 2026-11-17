@@ -29,7 +29,7 @@ describe("fluxo de autenticação", () => {
     const user = userEvent.setup();
     renderAuthFlow();
 
-    await user.type(screen.getByLabelText("Usuário"), "fernando");
+    await user.type(screen.getByLabelText("Usuário"), "admin");
     await user.type(screen.getByLabelText("Senha"), "123456");
     await user.click(screen.getByRole("button", { name: "Entrar" }));
 
@@ -42,7 +42,7 @@ describe("fluxo de autenticação", () => {
     renderAuthFlow();
 
     fireEvent.change(screen.getByLabelText("Usuário"), {
-      target: { value: "fernando" },
+      target: { value: "admin" },
     });
     fireEvent.change(screen.getByLabelText("Senha"), {
       target: { value: "senha-incorreta" },
