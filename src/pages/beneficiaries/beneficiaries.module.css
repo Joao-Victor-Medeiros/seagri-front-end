@@ -191,6 +191,50 @@
   overflow-wrap: anywhere;
 }
 
+.printDialog {
+  display: flex;
+  width: min(96vw, 72rem);
+  max-width: 72rem;
+  height: min(92vh, 60rem);
+  max-height: 92vh;
+  flex-direction: column;
+}
+
+.previewArea {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid #e2eae4;
+  border-radius: 0.5rem;
+  background: #f5f8f6;
+}
+
+.previewFrame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fff;
+}
+
+.previewMessage,
+.previewError {
+  padding: 1.5rem;
+  color: #637168;
+  text-align: center;
+}
+
+.previewError p {
+  margin: 0 0 1rem;
+  color: hsl(var(--destructive));
+}
+
+.printActions {
+  margin-top: 0.25rem;
+}
+
 @media (max-width: 720px) {
   .page {
     padding: 1rem;

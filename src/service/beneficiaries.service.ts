@@ -1,4 +1,5 @@
 import type {
+  BeneficiaryDetailDto,
   BeneficiaryListDto,
   BeneficiaryPage,
   BeneficiarySortField,
@@ -45,5 +46,7 @@ export const searchBeneficiaries = (
   return request(`/beneficiarios/search?${params.toString()}`);
 };
 
-export const getBeneficiaryReportUrl = (beneficiaryId: number | string) =>
-  `${API_BASE_URL}/relatorios/propriedade/${encodeURIComponent(String(beneficiaryId))}`;
+export const getBeneficiaryById = (
+  beneficiaryId: number | string,
+): Promise<BeneficiaryDetailDto> =>
+  request(`/beneficiarios/${encodeURIComponent(String(beneficiaryId))}`);

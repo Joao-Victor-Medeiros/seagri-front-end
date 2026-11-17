@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useRef, useState, type FormEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowDown,
@@ -10,7 +10,14 @@ import {
 } from "lucide-react";
 import { AppNavigation } from "@/components/app-navigation";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -33,10 +40,11 @@ import type {
   SortDirection,
 } from "@/interfaces/beneficiary.interface";
 import {
-  getBeneficiaryReportUrl,
+  getBeneficiaryById,
   getBeneficiaries,
   searchBeneficiaries,
 } from "@/service/beneficiaries.service";
+import { buildBeneficiaryReportHtml } from "@/utils/beneficiary-report";
 import styles from "./beneficiaries.module.css";
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
@@ -66,6 +74,10 @@ const BeneficiariesPage = () => {
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [selectedBeneficiary, setSelectedBeneficiary] =
     useState<BeneficiaryListDto | null>(null);
+  const [reportBeneficiary, setReportBeneficiary] =
+    useState<BeneficiaryListDto | null>(null);
+  const [reportPreviewLoaded, setReportPreviewLoaded] = useState(false);
+  const reportFrameRef = useRef<HTMLIFrameElement>(null);
 
   const beneficiariesQuery = useQuery({
     queryKey: activeSearch
@@ -76,6 +88,25 @@ const BeneficiariesPage = () => {
         ? searchBeneficiaries(activeSearch)
         : getBeneficiaries({ page, size: pageSize, sortField, sortDirection }),
   });
+
+  const beneficiaryDetailQuery = useQuery({
+    queryKey: ["beneficiario-relatorio", reportBeneficiary?.id],
+    enabled: reportBeneficiary !== null,
+    queryFn: () => {
+        if (!reportBeneficiary) {
+          throw new Error("Nenhum beneficiário selecionado para impressão.");
+        }
+
+        return getBeneficiaryById(reportBeneficiary.id);
+    },
+  });
+  const reportHtml = useMemo(
+    () =>
+        beneficiaryDetailQuery.data
+          ? buildBeneficiaryReportHtml(beneficiaryDetailQuery.data)
+          : "",
+    [beneficiaryDetailQuery.data],
+  );
 
   const searchResults = Array.isArray(beneficiariesQuery.data)
     ? beneficiariesQuery.data
@@ -153,6 +184,12 @@ const BeneficiariesPage = () => {
     ) : (
       <ArrowDown size={14} aria-hidden="true" />
     );
+  };
+
+  const printReport = () => {
+    const previewWindow = reportFrameRef.current?.contentWindow;
+    previewWindow?.focus();
+    previewWindow?.print();
   };
 
   return (
@@ -287,20 +324,17 @@ const BeneficiariesPage = () => {
                         {beneficiary.id !== null &&
                         beneficiary.id !== undefined ? (
                           <Button
-                            asChild
                             type="button"
                             variant="ghost"
                             size="icon"
+                            aria-label={`Pré-visualizar relatório de ${beneficiary.nome}`}
+                            title="Pré-visualizar e imprimir relatório"
+                            onClick={() => {
+                                setReportPreviewLoaded(false);
+                              setReportBeneficiary(beneficiary);
+                            }}
                           >
-                            <a
-                              href={getBeneficiaryReportUrl(beneficiary.id)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              aria-label={`Imprimir relatório de ${beneficiary.nome}`}
-                              title="Abrir relatório para impressão"
-                            >
-                              <Printer size={17} aria-hidden="true" />
-                            </a>
+                            <Printer size={17} aria-hidden="true" />
                           </Button>
                         ) : (
                           <Button
@@ -395,6 +429,82 @@ const BeneficiariesPage = () => {
                 </div>
               ))}
             </dl>
+          </DialogContent>
+        )}
+      </Dialog>
+
+      <Dialog
+        open={reportBeneficiary !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setReportBeneficiary(null);
+          }
+        }}
+      >
+        {reportBeneficiary && (
+          <DialogContent className={styles.printDialog}>
+            <DialogHeader>
+              <DialogTitle>Pré-visualização do relatório</DialogTitle>
+              <DialogDescription>
+                {beneficiaryDetailQuery.data?.informacoesPessoais.nome ??
+                  reportBeneficiary.nome}{" "}
+                ·{" "}
+                {beneficiaryDetailQuery.data?.enderecoRural.nomePropriedade ??
+                  reportBeneficiary.nomePropriedade}
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className={styles.previewArea}>
+              {beneficiaryDetailQuery.isLoading && (
+                <p className={styles.previewMessage} role="status">
+                  Carregando dados e preparando a página A4...
+                </p>
+              )}
+              {beneficiaryDetailQuery.isError && (
+                <div className={styles.previewError} role="alert">
+                  <p>
+                    Não foi possível carregar os dados do beneficiário.{" "}
+                    {beneficiaryDetailQuery.error instanceof Error
+                      ? beneficiaryDetailQuery.error.message
+                      : ""}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => beneficiaryDetailQuery.refetch()}
+                  >
+                    Tentar novamente
+                  </Button>
+                </div>
+              )}
+              {beneficiaryDetailQuery.data && (
+                <iframe
+                  ref={reportFrameRef}
+                  className={styles.previewFrame}
+                  srcDoc={reportHtml}
+                  title={`Pré-visualização do relatório de ${reportBeneficiary.nome}`}
+                  onLoad={() => setReportPreviewLoaded(true)}
+                />
+              )}
+            </div>
+
+            <DialogFooter className={styles.printActions}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setReportBeneficiary(null)}
+              >
+                Fechar
+              </Button>
+              <Button
+                type="button"
+                disabled={!beneficiaryDetailQuery.data || !reportPreviewLoaded}
+                onClick={printReport}
+              >
+                <Printer size={16} aria-hidden="true" />
+                Imprimir / Salvar em PDF
+              </Button>
+            </DialogFooter>
           </DialogContent>
         )}
       </Dialog>
