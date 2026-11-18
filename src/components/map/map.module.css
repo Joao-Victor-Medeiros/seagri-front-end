@@ -6,6 +6,16 @@
   box-shadow: 0 12px 24px rgb(0 0 0 / 8%);
 }
 
+.exportMap {
+  position: fixed;
+  top: 0;
+  left: -9999px;
+  width: 1200px;
+  height: 800px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
 .loading {
   height: 400px;
   border-radius: 0.75rem;

@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { MapComponent } from "@/components/MapComponent";
 import type { LocationSectionProps } from "@/components/forms/mobile-form/types";
 import styles from "./location-info.module.css";
@@ -10,6 +11,10 @@ export const LocationInfoSection = ({
   formData,
   setFieldValue,
   polygonPointsCount,
+  captureRef,
+  isGeneratingReport,
+  reportError,
+  onGenerateReport,
 }: LocationSectionProps) => {
   return (
     <div className={styles.section}>
@@ -95,9 +100,22 @@ export const LocationInfoSection = ({
 
       <div className={styles.field}>
         <Label htmlFor="map">Localizacao no Mapa *</Label>
-        <MapComponent />
+        <MapComponent captureRef={captureRef} />
         {polygonPointsCount > 0 ? (
           <p className={styles.helper}>Poligono definido com {polygonPointsCount} pontos.</p>
+        ) : null}
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onGenerateReport}
+          disabled={polygonPointsCount < 3 || isGeneratingReport}
+        >
+          {isGeneratingReport ? "Gerando relatório..." : "Gerar relatório PDF"}
+        </Button>
+        {reportError ? (
+          <p className={styles.error} role="alert">
+            {reportError}
+          </p>
         ) : null}
       </div>
     </div>

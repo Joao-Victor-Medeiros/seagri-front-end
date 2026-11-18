@@ -1,5 +1,7 @@
+import type { RefObject } from "react";
 import type { FarmerFormData, FormStep, ProductItem } from "@/interfaces/form.interface";
 import type { LatLngPoint } from "@/interfaces/map.interface";
+import type { MapCaptureHandle } from "@/hooks/map/use-property-report";
 
 export interface SectionBaseProps {
   formData: FarmerFormData;
@@ -14,6 +16,10 @@ export interface ProductionSectionProps extends SectionBaseProps {
 
 export interface LocationSectionProps extends SectionBaseProps {
   polygonPointsCount: number;
+  captureRef: RefObject<MapCaptureHandle | null>;
+  isGeneratingReport: boolean;
+  reportError: string | null;
+  onGenerateReport: () => void;
 }
 
 export interface StepHeaderProps {
