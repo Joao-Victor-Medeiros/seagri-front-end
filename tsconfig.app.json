@@ -32,5 +32,12 @@
   },
   "include": [
     "src"
-, "__mocks__/map-bounds.ts"  ]
+  , "__mocks__/map-bounds.ts"
+  ],
+  "exclude": [
+    "src/**/*.spec.ts",
+    "src/**/*.spec.tsx",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx"
+  ]
 }
